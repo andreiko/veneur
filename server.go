@@ -654,7 +654,11 @@ func (s *Server) HandleTracePacket(packet []byte) {
 	s.handleSSF(span, map[string]string{"ssf_format": "packet"})
 }
 
-func (s *Server) handleSSF(span *ssf.SSFSpan, tags map[string]string) {
+func (s *Server) handleSSF(span *ssf.SSFSpan, baseTags map[string]string) {
+	tags := map[string]string{}
+	for k, v := range baseTags {
+		tags[k] = v
+	}
 	tags["service"] = span.Service
 	defer metrics.ReportBatch(s.TraceClient, []*ssf.SSFSample{
 		ssf.Count("ssf.spans.received_total", 1, tags),
